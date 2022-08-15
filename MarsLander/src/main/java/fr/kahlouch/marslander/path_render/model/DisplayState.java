@@ -1,4 +1,4 @@
-package main.java.fr.kahlouch.marslander.path_render.model;
+package fr.kahlouch.marslander.path_render.model;
 
 import fr.kahlouch.genetic.GeneticAlgorithm;
 import fr.kahlouch.genetic.population.Population;

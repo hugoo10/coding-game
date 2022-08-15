@@ -1,4 +1,4 @@
-package main.java.fr.kahlouch.marslander.path_render;
+package fr.kahlouch.marslander.path_render;
 
 import fr.kahlouch.gameresources.graphics._2d.Graphics2D;
 import fr.kahlouch.gameresources.input_handling.ICommand;

@@ -1,4 +1,4 @@
-package main.java.fr.kahlouch.marslander;
+package fr.kahlouch.marslander;
 
 import fr.kahlouch.genetic.utils.HistoryType;
 import fr.kahlouch.marslander.path_render.Mars;

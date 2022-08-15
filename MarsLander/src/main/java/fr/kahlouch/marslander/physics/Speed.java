@@ -1,4 +1,4 @@
-package main.java.fr.kahlouch.marslander.physics;
+package fr.kahlouch.marslander.physics;
 
 
 import javafx.geometry.Point2D;

@@ -1,4 +1,4 @@
-package main.java.fr.kahlouch.marslander.model.factory;
+package fr.kahlouch.marslander.model.factory;
 
 import fr.kahlouch.genetic.factory.AbstractGeneFactory;
 import fr.kahlouch.genetic.population.Gene;

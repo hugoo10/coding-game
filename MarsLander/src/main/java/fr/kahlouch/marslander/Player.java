@@ -1,4 +1,4 @@
-package main.java.fr.kahlouch.marslander;
+package fr.kahlouch.marslander;
 
 import fr.kahlouch.genetic.GeneticAlgorithm;
 import fr.kahlouch.genetic.population.Population;

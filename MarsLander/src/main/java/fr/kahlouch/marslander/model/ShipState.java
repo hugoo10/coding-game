@@ -1,4 +1,4 @@
-package main.java.fr.kahlouch.marslander.model;
+package fr.kahlouch.marslander.model;
 
 import fr.kahlouch.marslander.model.factory.ShipGeneFactory;
 import fr.kahlouch.marslander.physics.Acceleration;
