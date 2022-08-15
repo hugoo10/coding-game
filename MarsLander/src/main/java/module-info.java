@@ -4,5 +4,5 @@ module MarsLander {
     requires javafx.controls;
     requires java.desktop;
 
-    exports fr.kahlouch.marslander;
+    exports fr.kahlouch.codingame.marslander;
 }

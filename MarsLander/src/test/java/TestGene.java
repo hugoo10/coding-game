@@ -1,8 +1,8 @@
 package test.java;
 
+import fr.kahlouch.codingame.marslander.model.ShipGene;
+import fr.kahlouch.codingame.marslander.model.factory.ShipGeneFactory;
 import fr.kahlouch.genetic.population.Gene;
-import fr.kahlouch.marslander.model.ShipGene;
-import fr.kahlouch.marslander.model.factory.ShipGeneFactory;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
