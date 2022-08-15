@@ -1,8 +1,8 @@
 package fr.kahlouch.codingame.exporter.crawler;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -17,7 +17,7 @@ public class SimpleProjectCrawler implements ProjectCrawler {
     @Override
     public String crawl(Path path) {
         List<String> javaFilesName = new ArrayList<>();
-        importFiles(javaFilesName, path.toFile());
+        importFiles(javaFilesName, path);
         final Set<String> imports = new TreeSet<>();
         final Set<String> packages = new TreeSet<>();
         final List<String> classes = new ArrayList<>();
@@ -62,19 +62,21 @@ public class SimpleProjectCrawler implements ProjectCrawler {
         return tmp.toString();
     }
 
-    private static void importFiles(List<String> javaFilesPaths, File rootFolder) {
-        if (rootFolder != null) {
-            for (File file : rootFolder.listFiles()) {
-                if (file.isDirectory()) {
-                    importFiles(javaFilesPaths, file);
-                } else if (file.getAbsolutePath().endsWith(".java") && filesToExclude.stream().noneMatch(fileToExclude -> file.getAbsolutePath().matches(fileToExclude))) {
-                    if (file.getAbsolutePath().endsWith("Player.java")) {
-                        javaFilesPaths.add(0, file.getAbsolutePath());
+    private static void importFiles(List<String> javaFilesPaths, Path rootFolder) {
+        try (final var stream = Files.list(rootFolder)) {
+            stream.forEach(subPath -> {
+                if (Files.isDirectory(subPath)) {
+                    importFiles(javaFilesPaths, subPath);
+                } else if (subPath.endsWith(".java") && filesToExclude.stream().noneMatch(fileToExclude -> subPath.toString().matches(fileToExclude))) {
+                    if (subPath.toString().equals("Player.java")) {
+                        javaFilesPaths.add(0, subPath.toAbsolutePath().toString());
                     } else {
-                        javaFilesPaths.add(file.getAbsolutePath());
+                        javaFilesPaths.add(subPath.toAbsolutePath().toString());
                     }
                 }
-            }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
