@@ -1,4 +1,4 @@
-package fr.kahlouch.codingame.codebuster;
+package fr.kahlouch.codingame.codebuster.test;
 
 import java.util.*;
 

@@ -1,5 +1,10 @@
 package fr.kahlouch.codingame.codebuster;
 
+import fr.kahlouch.codingame.codebuster.test.Buster;
+import fr.kahlouch.codingame.codebuster.test.GameMaster;
+import fr.kahlouch.codingame.codebuster.test.Ghost;
+import fr.kahlouch.codingame.codebuster.test.World;
+
 import java.util.Scanner;
 
 /**

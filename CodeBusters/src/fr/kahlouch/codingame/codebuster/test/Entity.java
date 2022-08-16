@@ -1,4 +1,4 @@
-package fr.kahlouch.codingame.codebuster;
+package fr.kahlouch.codingame.codebuster.test;
 
 public abstract class Entity {
 	public int id;

@@ -1,4 +1,4 @@
-package fr.kahlouch.codingame.codebuster;
+package fr.kahlouch.codingame.codebuster.test;
 
 public class Affine{
 	private double a;
