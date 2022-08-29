@@ -1,16 +1,23 @@
 package fr.kahlouch.codingame.exporter;
 
-import java.io.File;
+import fr.kahlouch.codingame.exporter.extractedJar.ExtractedJarDirectory;
+
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class Exporter {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args){
+        try(final var tmpDirectory = new ExtractedJarDirectory()) {
+            ProcessBuilder pb = new ProcessBuilder("jar", "xf", "C:\\Users\\hugok\\.m2\\repository\\fr\\kahlouch\\Genetic\\2.0.1\\Genetic-2.0.1.jar");
+            pb.directory(tmpDirectory.getPath().toFile());
+            pb.start().waitFor();
+            //final PrintWriter writer = new PrintWriter(System.out);
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         //%userprofile%
-        ProcessBuilder pb = new ProcessBuilder("jar", "xf", ".\\Genetic-2.0.1.jar");
-        pb.directory(new File("C:\\Users\\hugok\\.m2\\repository\\fr\\kahlouch\\Genetic\\2.0.1"));
-        pb.start();
-        final PrintWriter writer = new PrintWriter(System.out);
+
 
        /* try {
             Decompiler.decompile(
