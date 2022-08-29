@@ -15,7 +15,7 @@ public class SimpleProjectCrawler implements ProjectCrawler {
     );
 
     @Override
-    public String crawl(Path path) {
+    public String crawl(Path path, String... importWhiteList) {
         List<String> javaFilesName = new ArrayList<>();
         importFiles(javaFilesName, path);
         final Set<String> imports = new TreeSet<>();
