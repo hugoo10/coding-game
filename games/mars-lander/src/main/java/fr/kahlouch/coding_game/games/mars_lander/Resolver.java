@@ -1,10 +1,10 @@
 package fr.kahlouch.coding_game.games.mars_lander;
 
-import fr.kahlouch.codingame.marslander.model.Ship;
-import fr.kahlouch.codingame.marslander.model.ShipState;
-import fr.kahlouch.codingame.marslander.model.World;
-import fr.kahlouch.codingame.marslander.model.factory.ShipFactory;
-import fr.kahlouch.codingame.marslander.model.factory.ShipGeneFactory;
+import fr.kahlouch.coding_game.games.mars_lander.model.Ship;
+import fr.kahlouch.coding_game.games.mars_lander.model.ShipState;
+import fr.kahlouch.coding_game.games.mars_lander.model.World;
+import fr.kahlouch.coding_game.games.mars_lander.model.factory.ShipFactory;
+import fr.kahlouch.coding_game.games.mars_lander.model.factory.ShipGeneFactory;
 import fr.kahlouch.genetic.GeneticAlgorithm;
 import fr.kahlouch.genetic.GeneticAlgorithmParams;
 import fr.kahlouch.genetic.algorithms.filling.FillingType;

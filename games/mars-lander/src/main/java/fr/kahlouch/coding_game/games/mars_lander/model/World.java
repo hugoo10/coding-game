@@ -1,7 +1,8 @@
 package fr.kahlouch.coding_game.games.mars_lander.model;
 
-import fr.kahlouch.codingame.marslander.physics.Acceleration;
-import fr.kahlouch.codingame.marslander.physics.Position;
+
+import fr.kahlouch.coding_game.games.mars_lander.physics.Acceleration;
+import fr.kahlouch.coding_game.games.mars_lander.physics.Position;
 import javafx.geometry.Point2D;
 
 import java.awt.geom.Line2D;

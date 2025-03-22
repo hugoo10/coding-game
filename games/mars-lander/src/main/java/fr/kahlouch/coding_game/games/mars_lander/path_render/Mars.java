@@ -1,8 +1,9 @@
 package fr.kahlouch.coding_game.games.mars_lander.path_render;
 
-import fr.kahlouch.codingame.marslander.path_render.component.graphics.MarsGraphicsComponent;
-import fr.kahlouch.codingame.marslander.path_render.controller.InputHandlerImpl;
-import fr.kahlouch.codingame.marslander.path_render.model.DisplayState;
+
+import fr.kahlouch.coding_game.games.mars_lander.path_render.component.graphics.MarsGraphicsComponent;
+import fr.kahlouch.coding_game.games.mars_lander.path_render.controller.InputHandlerImpl;
+import fr.kahlouch.coding_game.games.mars_lander.path_render.model.DisplayState;
 import fr.kahlouch.gameresources.graphics._2d.Graphics2D;
 import fr.kahlouch.gameresources.input_handling.ICommand;
 import fr.kahlouch.gameresources.pattern.game_loop.CatchUpGameLoop;

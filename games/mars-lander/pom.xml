@@ -7,6 +7,7 @@
         <groupId>fr.kahlouch.coding-game</groupId>
         <artifactId>games</artifactId>
         <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>fr.kahlouch.coding-game.games</groupId>
@@ -14,25 +15,18 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>${java.version}</version>
+            <groupId>com.github.hugoo10</groupId>
+            <artifactId>genetic</artifactId>
+            <version>1.0.1</version>
         </dependency>
+
+
         <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-base</artifactId>
-            <version>${java.version}</version>
+            <groupId>com.github.hugoo10</groupId>
+            <artifactId>gameresources</artifactId>
+            <version>1.0.1</version>
         </dependency>
-<!--        <dependency>
-            <groupId>fr.kahlouch</groupId>
-            <artifactId>Genetic</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.kahlouch</groupId>
-            <artifactId>game-resources</artifactId>
-            <version>2.0.0</version>
-        </dependency>-->
+
     </dependencies>
     <build>
         <plugins>

@@ -1,7 +1,8 @@
 package fr.kahlouch.coding_game.games.mars_lander.path_render.controller;
 
-import fr.kahlouch.codingame.marslander.path_render.controller.command.*;
-import fr.kahlouch.codingame.marslander.path_render.model.DisplayState;
+
+import fr.kahlouch.coding_game.games.mars_lander.path_render.controller.command.*;
+import fr.kahlouch.coding_game.games.mars_lander.path_render.model.DisplayState;
 import fr.kahlouch.gameresources.input_handling.ICommand;
 import fr.kahlouch.gameresources.input_handling.InputHandler;
 import javafx.scene.input.InputEvent;

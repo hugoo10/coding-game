@@ -1,6 +1,7 @@
 package fr.kahlouch.coding_game.games.mars_lander.model;
 
-import fr.kahlouch.codingame.marslander.physics.Speed;
+
+import fr.kahlouch.coding_game.games.mars_lander.physics.Speed;
 import fr.kahlouch.genetic.population.Gene;
 import fr.kahlouch.genetic.population.Individual;
 import javafx.geometry.Point2D;

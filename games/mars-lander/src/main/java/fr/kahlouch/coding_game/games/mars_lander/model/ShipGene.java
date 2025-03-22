@@ -1,7 +1,7 @@
 package fr.kahlouch.coding_game.games.mars_lander.model;
 
-import fr.kahlouch.codingame.marslander.model.factory.ShipGeneFactory;
-import fr.kahlouch.codingame.marslander.physics.Acceleration;
+import fr.kahlouch.coding_game.games.mars_lander.model.factory.ShipGeneFactory;
+import fr.kahlouch.coding_game.games.mars_lander.physics.Acceleration;
 import fr.kahlouch.genetic.population.Gene;
 
 public class ShipGene implements Gene {

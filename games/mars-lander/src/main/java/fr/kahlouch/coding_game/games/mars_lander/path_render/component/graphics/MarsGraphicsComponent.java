@@ -1,11 +1,12 @@
 package fr.kahlouch.coding_game.games.mars_lander.path_render.component.graphics;
 
 
-import fr.kahlouch.codingame.marslander.model.Ship;
-import fr.kahlouch.codingame.marslander.model.ShipState;
-import fr.kahlouch.codingame.marslander.model.World;
-import fr.kahlouch.codingame.marslander.path_render.model.DisplayState;
-import fr.kahlouch.codingame.marslander.physics.Position;
+
+import fr.kahlouch.coding_game.games.mars_lander.model.Ship;
+import fr.kahlouch.coding_game.games.mars_lander.model.ShipState;
+import fr.kahlouch.coding_game.games.mars_lander.model.World;
+import fr.kahlouch.coding_game.games.mars_lander.path_render.model.DisplayState;
+import fr.kahlouch.coding_game.games.mars_lander.physics.Position;
 import fr.kahlouch.gameresources.graphics._2d.Graphics2D;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;

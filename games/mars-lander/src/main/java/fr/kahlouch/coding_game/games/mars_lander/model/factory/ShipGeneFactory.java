@@ -1,7 +1,8 @@
 package fr.kahlouch.coding_game.games.mars_lander.model.factory;
 
-import fr.kahlouch.codingame.marslander.model.ShipGene;
-import fr.kahlouch.codingame.marslander.physics.Acceleration;
+
+import fr.kahlouch.coding_game.games.mars_lander.model.ShipGene;
+import fr.kahlouch.coding_game.games.mars_lander.physics.Acceleration;
 import fr.kahlouch.genetic.factory.AbstractGeneFactory;
 import fr.kahlouch.genetic.population.Gene;
 import fr.kahlouch.genetic.utils.Constants;

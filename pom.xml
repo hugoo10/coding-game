@@ -9,13 +9,21 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+
     <modules>
         <module>exporter-plugin</module>
         <module>games</module>
     </modules>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>23</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

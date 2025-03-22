@@ -1,6 +1,6 @@
 package fr.kahlouch.coding_game.games.mars_lander;
 
-import fr.kahlouch.codingame.marslander.path_render.Mars;
+import fr.kahlouch.coding_game.games.mars_lander.path_render.Mars;
 import fr.kahlouch.genetic.utils.HistoryType;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import java.util.Map;
 
 public class Test extends Application {
+    //TODO enum
     private static final Map<Integer, String> MAP_FILES = Map.ofEntries(
             Map.entry(0, "flat.txt"),
             Map.entry(1, "easy_right.txt"),
@@ -24,7 +25,7 @@ public class Test extends Application {
     @Override
     public void start(Stage stage) {
         try (
-                final var inputStream = Test.class.getClassLoader().getResourceAsStream(MAP_FILES.get(8));
+                final var inputStream = Test.class.getClassLoader().getResourceAsStream(MAP_FILES.get(7));
         ) {
             final var resolver = Resolver.getInstance();
             final var geneticAlgorithm = resolver.loadData(inputStream, 300D, null);

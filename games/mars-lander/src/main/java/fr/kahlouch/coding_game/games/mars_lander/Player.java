@@ -1,7 +1,8 @@
 package fr.kahlouch.coding_game.games.mars_lander;
 
-import fr.kahlouch.codingame.marslander.model.Ship;
-import fr.kahlouch.codingame.marslander.model.ShipGene;
+
+import fr.kahlouch.coding_game.games.mars_lander.model.Ship;
+import fr.kahlouch.coding_game.games.mars_lander.model.ShipGene;
 import fr.kahlouch.genetic.GeneticAlgorithm;
 import fr.kahlouch.genetic.population.Population;
 import fr.kahlouch.genetic.utils.HistoryType;
