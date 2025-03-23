@@ -4,64 +4,63 @@ import fr.kahlouch.coding_game.games.mars_lander.model.Ship;
 import fr.kahlouch.coding_game.games.mars_lander.model.ShipState;
 import fr.kahlouch.coding_game.games.mars_lander.model.World;
 import fr.kahlouch.coding_game.games.mars_lander.model.factory.ShipFactory;
-import fr.kahlouch.coding_game.games.mars_lander.model.factory.ShipGeneFactory;
-import fr.kahlouch.genetic.GeneticAlgorithm;
-import fr.kahlouch.genetic.GeneticAlgorithmParams;
-import fr.kahlouch.genetic.algorithms.filling.FillingType;
-import fr.kahlouch.genetic.algorithms.mating.MatingType;
-import fr.kahlouch.genetic.algorithms.mutation.MutationType;
-import fr.kahlouch.genetic.algorithms.pairing.PairingType;
-import fr.kahlouch.genetic.algorithms.selection.SelectionType;
+import fr.kahlouch.genetic.algorithms._genetic.GeneticAlgorithm;
+import fr.kahlouch.genetic.algorithms.filling.Filling;
+import fr.kahlouch.genetic.algorithms.filling.FillingAlgorithm;
+import fr.kahlouch.genetic.algorithms.mating.Mating;
+import fr.kahlouch.genetic.algorithms.mating.MatingAlgorithm;
+import fr.kahlouch.genetic.algorithms.mutation.Mutation;
+import fr.kahlouch.genetic.algorithms.mutation.MutationAlgorithm;
+import fr.kahlouch.genetic.algorithms.pairing.Pairing;
+import fr.kahlouch.genetic.algorithms.pairing.PairingAlgorithm;
+import fr.kahlouch.genetic.algorithms.selection.Selection;
+import fr.kahlouch.genetic.algorithms.selection.SelectionAlgorithm;
+import fr.kahlouch.genetic.factory.GeneticFactory;
 import fr.kahlouch.genetic.population.Gene;
 import fr.kahlouch.genetic.population.Individual;
-import fr.kahlouch.genetic.population.Population;
+import fr.kahlouch.genetic.population.NewBornGeneration;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Resolver {
-    private static final Resolver resolver = new Resolver();
+public enum Resolver {
+    INSTANCE;
+
     private final int chromosomeSize = 200;
     private final int populationSize = 100;
-    private final ShipGeneFactory shipGeneFactory = new ShipGeneFactory();
-    private final ShipFactory shipFactory = new ShipFactory(chromosomeSize, shipGeneFactory);
-    private final GeneticAlgorithmParams params = GeneticAlgorithmParams.builder()
-            .filling(FillingType.RANDOM_BREED_BEST)
-            .mutation(MutationType.RESET)
-            .mating(MatingType.TWO_POINTS)
-            .pairing(PairingType.FITTEST)
-            .selection(SelectionType.FITTEST)
-            .geneFactory(this.shipGeneFactory)
-            .individualFactory(this.shipFactory)
-            .populationSize(populationSize)
-            .selectionSize(10)
-            .pairingSize(60)
-            .mutationOdd(0.01)
-            .fillingRetrieveTopSize(10)
+    private final GeneticFactory shipFactory = new ShipFactory(chromosomeSize);
+    private final GeneticAlgorithm geneticAlgorithm = GeneticAlgorithm.builder(populationSize, shipFactory)
+            .filling(new Filling(FillingAlgorithm.RANDOM_BREED_BEST, 10))
+            .mutation(new Mutation(MutationAlgorithm.RESET, 0.01))
+            .mating(new Mating(MatingAlgorithm.TWO_POINTS))
+            .pairing(new Pairing(PairingAlgorithm.FITTEST, 60))
+            .selection(new Selection(SelectionAlgorithm.FITTEST, 10))
             .build();
 
-    public static Resolver getInstance() {
-        return resolver;
+    public GeneticAlgorithm getGeneticAlgorithm() {
+        return geneticAlgorithm;
     }
 
-    public GeneticAlgorithm loadData(InputStream is, Double fitnessCap, Long timeCapInMillis) {
+    public GeneticFactory getShipFactory() {
+        return shipFactory;
+    }
+
+    public void loadWorldAndShipState(InputStream is) {
         final var scanner = new Scanner(is);
         World.loadWorld(scanner);
         ShipState.loadInitialState(scanner);
-        return new GeneticAlgorithm(params,  fitnessCap, timeCapInMillis);
     }
 
-    public GeneticAlgorithm reloadData(InputStream is, Double fitnessCap, Long timeCapInMillis) {
+    public void loadShipState(InputStream is) {
         final var scanner = new Scanner(is);
         ShipState.loadInitialState(scanner);
-        return new GeneticAlgorithm(params, fitnessCap, timeCapInMillis);
     }
 
-    public Population firstGeneration() {
+    public NewBornGeneration firstGeneration() {
         final List<Individual> individuals = new ArrayList<>();
-        ShipGeneFactory.ALL_EXISTING_GENES_MAP.forEach((key, shipGene) -> {
+        ShipFactory.ALL_EXISTING_GENES_MAP.forEach((_, shipGene) -> {
             List<Gene> chromosome = new ArrayList<>();
             for (var i = 0; i < chromosomeSize; ++i) {
                 chromosome.add(shipGene);
@@ -69,8 +68,8 @@ public class Resolver {
             individuals.add(new Ship(chromosome));
         });
         for (var i = individuals.size(); i < populationSize; ++i) {
-            individuals.add(shipFactory.createRandom());
+            individuals.add(shipFactory.createRandomIndividual());
         }
-        return new Population(individuals);
+        return new NewBornGeneration(1, individuals);
     }
 }

@@ -7,7 +7,7 @@ import fr.kahlouch.coding_game.games.mars_lander.path_render.model.DisplayState;
 import fr.kahlouch.gameresources.graphics._2d.Graphics2D;
 import fr.kahlouch.gameresources.input_handling.ICommand;
 import fr.kahlouch.gameresources.pattern.game_loop.CatchUpGameLoop;
-import fr.kahlouch.genetic.GeneticAlgorithm;
+import fr.kahlouch.genetic.algorithms._genetic.GeneticAlgorithmExecutionHistory;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
@@ -17,9 +17,9 @@ public class Mars extends CatchUpGameLoop {
     private final Graphics2D graphics;
     private final MarsGraphicsComponent marsGraphicsComponent;
 
-    public Mars(GeneticAlgorithm geneticAlgorithm, Stage stage) {
+    public Mars(GeneticAlgorithmExecutionHistory history, Stage stage) {
         super(60);
-        this.displayState = new DisplayState(geneticAlgorithm);
+        this.displayState = new DisplayState(history);
         this.inputHandler = new InputHandlerImpl(displayState);
         this.graphics = Graphics2D.builder(stage)
 

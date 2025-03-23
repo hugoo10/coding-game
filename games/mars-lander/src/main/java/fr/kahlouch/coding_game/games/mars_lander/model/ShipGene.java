@@ -1,11 +1,11 @@
 package fr.kahlouch.coding_game.games.mars_lander.model;
 
-import fr.kahlouch.coding_game.games.mars_lander.model.factory.ShipGeneFactory;
+import fr.kahlouch.coding_game.games.mars_lander.model.factory.ShipFactory;
 import fr.kahlouch.coding_game.games.mars_lander.physics.Acceleration;
+import fr.kahlouch.genetic.population.BreededGene;
 import fr.kahlouch.genetic.population.Gene;
 
 public class ShipGene implements Gene {
-    public static final ShipGeneFactory GENE_FACTORY = new ShipGeneFactory();
     private int angle;
     private int power;
     private Acceleration acceleration;
@@ -50,15 +50,15 @@ public class ShipGene implements Gene {
     }
 
     @Override
-    public Gene[] breed(Gene gene, double random) {
-        final ShipGene[] genes = new ShipGene[2];
+    public BreededGene breed(Gene gene, double random) {
         final ShipGene mate = (ShipGene) gene;
         double angle1 = (random * this.angle) + (1 - random) * mate.angle;
         double angle2 = (random * mate.angle) + (1 - random) * this.angle;
         double power1 = (random * this.power) + (1 - random) * mate.power;
         double power2 = (random * mate.power) + (1 - random) * this.power;
-        genes[0] = ShipGeneFactory.getGeneByAngleAndPower(GENE_FACTORY.convertAngleDoubleToInt(angle1), GENE_FACTORY.convertPowerDoubleToInt(power1));
-        genes[1] = ShipGeneFactory.getGeneByAngleAndPower(GENE_FACTORY.convertAngleDoubleToInt(angle2), GENE_FACTORY.convertPowerDoubleToInt(power2));
-        return genes;
+
+        final var gene1 = ShipFactory.getGeneByAngleAndPower(ShipFactory.convertAngleDoubleToInt(angle1), ShipFactory.convertPowerDoubleToInt(power1));
+        final var gene2 = ShipFactory.getGeneByAngleAndPower(ShipFactory.convertAngleDoubleToInt(angle2), ShipFactory.convertPowerDoubleToInt(power2));
+        return new BreededGene(gene1, gene2);
     }
 }

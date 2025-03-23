@@ -2,8 +2,9 @@ package fr.kahlouch.coding_game.games.mars_lander.model;
 
 
 import fr.kahlouch.coding_game.games.mars_lander.physics.Speed;
+import fr.kahlouch.genetic.population.EvaluatedIndividual;
 import fr.kahlouch.genetic.population.Gene;
-import fr.kahlouch.genetic.population.Individual;
+import fr.kahlouch.genetic.population.NewBornIndividual;
 import javafx.geometry.Point2D;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Ship extends Individual {
+public class Ship extends NewBornIndividual {
     private static final Speed MAX_LANDING_SPEED = new Speed(20, 40);
     private final List<ShipState> shipStates = new ArrayList<>();
     private Point2D intersectSurfacePoint;
@@ -21,11 +22,10 @@ public class Ship extends Individual {
     }
 
     @Override
-    public void computeFitness() {
-        if (this.fitness <= 0) {
-            this.computePath();
-            this.computeMark();
-        }
+    public EvaluatedIndividual computeFitness() {
+        computePath();
+        final var fitness = computeMark();
+        return new EvaluatedIndividual(this, fitness);
     }
 
     public List<ShipState> getShipStates() {
@@ -47,27 +47,28 @@ public class Ship extends Individual {
         } while (geneIt.hasNext() && (!isOutBound && this.intersectSurfacePoint == null));
     }
 
-    private void computeMark() {
+    private double computeMark() {
         final ShipState beforeLastShipState = this.shipStates.get(this.shipStates.size() - 2);
         final ShipState lastShipState = this.shipStates.get(this.shipStates.size() - 1);
+        double fitness;
 
         final World world = World.getInstance();
         if (world.isBetweenLandingZone(lastShipState.getPosition()) && world.isBetweenLandingZone(beforeLastShipState.getPosition()) && lastShipState.getPosition().getY() <= world.getLandingZoneMiddle().getY() && beforeLastShipState.getPosition().getY() >= world.getLandingZoneMiddle().getY()) {
-            this.fitness = 100;
+            fitness = 100;
             if (beforeLastShipState.getSpeed().speedYUnder(MAX_LANDING_SPEED) && lastShipState.getSpeed().speedYUnder(MAX_LANDING_SPEED)) {
-                this.fitness = 150;
+                fitness = 150;
                 if (beforeLastShipState.getSpeed().speedXUnder(MAX_LANDING_SPEED) && lastShipState.getSpeed().speedXUnder(MAX_LANDING_SPEED)) {
-                    this.fitness = 200;
+                    fitness = 200;
                     if (beforeLastShipState.getAngle() == 0 && lastShipState.getAngle() == 0) {
-                        this.fitness = 300;
+                        fitness = 300;
                     } else {
-                        this.fitness += (1 - Math.abs(lastShipState.getAngle()) / 90D) * 100;
+                        fitness += (1 - Math.abs(lastShipState.getAngle()) / 90D) * 100;
                     }
                 } else {
-                    this.fitness += ((MAX_LANDING_SPEED.getX() / Math.abs(lastShipState.getSpeed().getX())) * 50);
+                    fitness += ((MAX_LANDING_SPEED.getX() / Math.abs(lastShipState.getSpeed().getX())) * 50);
                 }
             } else {
-                this.fitness += (MAX_LANDING_SPEED.getY() / Math.abs(lastShipState.getSpeed().getY())) * 50;
+                fitness += (MAX_LANDING_SPEED.getY() / Math.abs(lastShipState.getSpeed().getY())) * 50;
             }
         } else {
             if (this.intersectSurfacePoint != null) {
@@ -93,12 +94,13 @@ public class Ship extends Individual {
                 for (int i = from; i < to; ++i) {
                     distance += world.getSurface().get(i).distance(world.getSurface().get(i + 1));
                 }
-                this.fitness = (1 - distance / world.getSurfaceLength()) * 100;
+                fitness = (1 - distance / world.getSurfaceLength()) * 100;
 
             } else {
-                this.fitness = -(world.getLandingZoneMiddle().distance(lastShipState.getPosition()) / world.getUpperRight().getX()) * 100;
+                fitness = -(world.getLandingZoneMiddle().distance(lastShipState.getPosition()) / world.getUpperRight().getX()) * 100;
             }
         }
+        return fitness;
     }
 
     @Override
@@ -106,8 +108,8 @@ public class Ship extends Individual {
         if (this.shipStates.isEmpty()) {
             return "Ship ready to launch!";
         } else {
-            final ShipState last = this.shipStates.get(this.shipStates.size() - 1);
-            return String.format("%s: POSITION: %s; SPEED: %s; ANGLE: %s", this.fitness, last.getPosition(), last.getSpeed(), last.getAngle());
+            final ShipState last = this.shipStates.getLast();
+            return String.format("POSITION: %s; SPEED: %s; ANGLE: %s", last.getPosition(), last.getSpeed(), last.getAngle());
         }
     }
 
