@@ -2,125 +2,157 @@ package fr.kahlouch.coding_game.games.mars_lander.model;
 
 
 import fr.kahlouch.coding_game.games.mars_lander.physics.Speed;
-import fr.kahlouch.genetic.population.EvaluatedIndividual;
-import fr.kahlouch.genetic.population.Gene;
-import fr.kahlouch.genetic.population.NewBornIndividual;
+import fr.kahlouch.genetic.algorithm.vo.FitnessComputeResult;
+import fr.kahlouch.genetic.algorithm.vo.Individual;
 import javafx.geometry.Point2D;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.function.BiPredicate;
 
-public class Ship extends NewBornIndividual {
+public class Ship extends Individual<ShipGene, ShipPath> {
     private static final Speed MAX_LANDING_SPEED = new Speed(20, 40);
-    private final List<ShipState> shipStates = new ArrayList<>();
-    private Point2D intersectSurfacePoint;
 
-    public Ship(List<Gene> chromosome) {
-        super(chromosome);
+    public Ship(List<ShipGene> genes) {
+        super(genes);
     }
 
     @Override
-    public EvaluatedIndividual computeFitness() {
-        computePath();
-        final var fitness = computeMark();
-        return new EvaluatedIndividual(this, fitness);
+    protected FitnessComputeResult<ShipPath> computeFitness() {
+        final var shipPath = computePath();
+        final var fitness = computeMark(shipPath);
+        return new FitnessComputeResult<>(fitness, shipPath);
     }
 
     public List<ShipState> getShipStates() {
-        return shipStates;
+        return Optional.ofNullable(this.fitnessComputeResult)
+                .map(FitnessComputeResult::computeData)
+                .map(ShipPath::shipStates)
+                .orElseThrow();
     }
 
-    private void computePath() {
+    private ShipPath computePath() {
         ShipState from = ShipState.getInitialShipState();
         ShipState to;
-        this.shipStates.add(from);
-        final Iterator<Gene> geneIt = this.chromosome.iterator();
+
+        final var shipStates = new ArrayList<ShipState>();
+        shipStates.add(from);
+        final Iterator<ShipGene> geneIt = this.genes.iterator();
         boolean isOutBound;
+        Point2D intersectSurfacePoint;
         do {
-            to = new ShipState(from, (ShipGene) geneIt.next());
+            to = new ShipState(from, geneIt.next());
+
             isOutBound = World.getInstance().isOutBound(from.getPosition(), to.getPosition());
-            this.intersectSurfacePoint = World.getInstance().pathCrossSurface(from.getPosition(), to.getPosition());
+            intersectSurfacePoint = World.getInstance().pathCrossSurface(from.getPosition(), to.getPosition());
             from = to;
-            this.shipStates.add(to);
-        } while (geneIt.hasNext() && (!isOutBound && this.intersectSurfacePoint == null));
+            shipStates.add(to);
+        } while (geneIt.hasNext() && (!isOutBound && intersectSurfacePoint == null));
+        return new ShipPath(shipStates, intersectSurfacePoint);
     }
 
-    private double computeMark() {
-        final ShipState beforeLastShipState = this.shipStates.get(this.shipStates.size() - 2);
-        final ShipState lastShipState = this.shipStates.get(this.shipStates.size() - 1);
-        double fitness;
+    private double computeMark(ShipPath shipPath) {
+        final ShipState beforeLastShipState = shipPath.shipStates().get(shipPath.shipStates().size() - 2);
+        final ShipState lastShipState = shipPath.shipStates().getLast();
 
-        final World world = World.getInstance();
-        if (world.isBetweenLandingZone(lastShipState.getPosition()) && world.isBetweenLandingZone(beforeLastShipState.getPosition()) && lastShipState.getPosition().getY() <= world.getLandingZoneMiddle().getY() && beforeLastShipState.getPosition().getY() >= world.getLandingZoneMiddle().getY()) {
-            fitness = 100;
-            if (beforeLastShipState.getSpeed().speedYUnder(MAX_LANDING_SPEED) && lastShipState.getSpeed().speedYUnder(MAX_LANDING_SPEED)) {
-                fitness = 150;
-                if (beforeLastShipState.getSpeed().speedXUnder(MAX_LANDING_SPEED) && lastShipState.getSpeed().speedXUnder(MAX_LANDING_SPEED)) {
-                    fitness = 200;
-                    if (beforeLastShipState.getAngle() == 0 && lastShipState.getAngle() == 0) {
-                        fitness = 300;
-                    } else {
-                        fitness += (1 - Math.abs(lastShipState.getAngle()) / 90D) * 100;
-                    }
-                } else {
-                    fitness += ((MAX_LANDING_SPEED.getX() / Math.abs(lastShipState.getSpeed().getX())) * 50);
-                }
-            } else {
-                fitness += (MAX_LANDING_SPEED.getY() / Math.abs(lastShipState.getSpeed().getY())) * 50;
-            }
-        } else {
-            if (this.intersectSurfacePoint != null) {
-                int idx = -1;
-                Boolean right = null;
-                for (int i = 0; i < world.getSurface().size() - 1; ++i) {
-                    Point2D from = world.getSurface().get(i);
-                    Point2D to = world.getSurface().get(i + 1);
-                    if (
-                            ((this.intersectSurfacePoint.getX() >= from.getX() && this.intersectSurfacePoint.getX() <= to.getX()) ||
-                                    (this.intersectSurfacePoint.getX() <= from.getX() && this.intersectSurfacePoint.getX() >= to.getX())) &&
-                                    ((this.intersectSurfacePoint.getY() >= from.getY() && this.intersectSurfacePoint.getY() <= to.getY()) ||
-                                            (this.intersectSurfacePoint.getY() <= from.getY() && this.intersectSurfacePoint.getY() >= to.getY()))
-                    ) {
-                        right = i >= world.getLandingZoneEndIdx();
-                        idx = right ? i : i + 1;
-                        break;
-                    }
-                }
-                double distance = world.getLandingZoneLength() + this.intersectSurfacePoint.distance(world.getSurface().get(idx));
-                int from = right ? world.getLandingZoneEndIdx() : idx;
-                int to = right ? idx : world.getLandingZoneStartIdx();
-                for (int i = from; i < to; ++i) {
-                    distance += world.getSurface().get(i).distance(world.getSurface().get(i + 1));
-                }
-                fitness = (1 - distance / world.getSurfaceLength()) * 100;
+        final World worldInstance = World.getInstance();
 
-            } else {
-                fitness = -(world.getLandingZoneMiddle().distance(lastShipState.getPosition()) / world.getUpperRight().getX()) * 100;
+        if (isInLandingZone(worldInstance).negate().test(beforeLastShipState, lastShipState)) {
+
+            if (shipPath.intersectSurfacePoint() == null) {
+                final var distanceFromMiddleLandingZone = worldInstance.getLandingZoneMiddle().distance(lastShipState.getPosition());
+                final var worldWidth = worldInstance.getUpperRight().getX();
+
+                return -100 * distanceFromMiddleLandingZone / worldWidth;
             }
+
+            int idx = -1;
+            Boolean right = null;
+            for (int i = 0; i < worldInstance.getSurface().size() - 1; ++i) {
+                Point2D from = worldInstance.getSurface().get(i);
+                Point2D to = worldInstance.getSurface().get(i + 1);
+                if (
+                        ((shipPath.intersectSurfacePoint().getX() >= from.getX() && shipPath.intersectSurfacePoint().getX() <= to.getX()) ||
+                                (shipPath.intersectSurfacePoint().getX() <= from.getX() && shipPath.intersectSurfacePoint().getX() >= to.getX())) &&
+                                ((shipPath.intersectSurfacePoint().getY() >= from.getY() && shipPath.intersectSurfacePoint().getY() <= to.getY()) ||
+                                        (shipPath.intersectSurfacePoint().getY() <= from.getY() && shipPath.intersectSurfacePoint().getY() >= to.getY()))
+                ) {
+                    right = i >= worldInstance.getLandingZoneEndIdx();
+                    idx = right ? i : i + 1;
+                    break;
+                }
+            }
+            double distance = worldInstance.getLandingZoneLength() + shipPath.intersectSurfacePoint().distance(worldInstance.getSurface().get(idx));
+            int from = right ? worldInstance.getLandingZoneEndIdx() : idx;
+            int to = right ? idx : worldInstance.getLandingZoneStartIdx();
+            for (int i = from; i < to; ++i) {
+                distance += worldInstance.getSurface().get(i).distance(worldInstance.getSurface().get(i + 1));
+            }
+            return (1 - distance / worldInstance.getSurfaceLength()) * 100;
         }
-        return fitness;
+
+
+        if (isLandingAtYSpeedUnderMaxSpeed().negate().test(beforeLastShipState, lastShipState)) {
+            final var absYSpeed = Math.abs(lastShipState.getSpeed().getY());
+            final var ySpeedScore = 50 * MAX_LANDING_SPEED.getY() / absYSpeed;
+
+            return 100 + ySpeedScore;
+        }
+
+        if (isLandingAtXSpeedUnderMaxSpeed().negate().test(beforeLastShipState, lastShipState)) {
+            final var absXSpeed = Math.abs(lastShipState.getSpeed().getX());
+            final var xSpeedScore = 50 * MAX_LANDING_SPEED.getX() / absXSpeed;
+
+            return 150 + xSpeedScore;
+        }
+
+        if (isLandingAtAngle0().negate().test(beforeLastShipState, lastShipState)) {
+            final var absAngle = Math.abs(lastShipState.getAngle());
+            final var angleScore = (1 - absAngle / 90D) * 100;
+            return 200 + angleScore;
+        }
+
+        return 300;
+
     }
+
+    private static BiPredicate<ShipState, ShipState> isInLandingZone(World world) {
+        final BiPredicate<ShipState, ShipState> isPositionBeforeLandingInLandingZone = (beforeLandState, _) -> world.isBetweenLandingZone(beforeLandState.getPosition());
+        final BiPredicate<ShipState, ShipState> isPositionAfterLandingInLandingZone = (_, afterLandState) -> world.isBetweenLandingZone(afterLandState.getPosition());
+        final BiPredicate<ShipState, ShipState> isPositionBeforeLandingOverLandingZone = (beforeLandState, _) -> beforeLandState.getPosition().getY() >= world.getLandingZoneMiddle().getY();
+        final BiPredicate<ShipState, ShipState> isPositionAfterLandingUnderLandingZone = (_, afterLandState) -> afterLandState.getPosition().getY() <= world.getLandingZoneMiddle().getY();
+
+        return isPositionBeforeLandingInLandingZone.and(isPositionAfterLandingInLandingZone)
+                .and(isPositionBeforeLandingOverLandingZone).and(isPositionAfterLandingUnderLandingZone);
+    }
+
+    private static BiPredicate<ShipState, ShipState> isLandingAtYSpeedUnderMaxSpeed() {
+        final BiPredicate<ShipState, ShipState> isStateBeforeLandingYSpeedUnder = (beforeLandState, _) -> beforeLandState.getSpeed().speedYUnder(MAX_LANDING_SPEED);
+        final BiPredicate<ShipState, ShipState> isStateAfterLandingYSpeedUnder = (_, afterLandState) -> afterLandState.getSpeed().speedYUnder(MAX_LANDING_SPEED);
+        return isStateBeforeLandingYSpeedUnder.and(isStateAfterLandingYSpeedUnder);
+    }
+
+    private static BiPredicate<ShipState, ShipState> isLandingAtXSpeedUnderMaxSpeed() {
+        final BiPredicate<ShipState, ShipState> isStateBeforeLandingXSpeedUnder = (beforeLandState, _) -> beforeLandState.getSpeed().speedXUnder(MAX_LANDING_SPEED);
+        final BiPredicate<ShipState, ShipState> isStateAfterLandingXSpeedUnder = (_, afterLandState) -> afterLandState.getSpeed().speedXUnder(MAX_LANDING_SPEED);
+        return isStateBeforeLandingXSpeedUnder.and(isStateAfterLandingXSpeedUnder);
+    }
+
+    private static BiPredicate<ShipState, ShipState> isLandingAtAngle0() {
+        final BiPredicate<ShipState, ShipState> isStateBeforeLandingAtAngle0 = (beforeLandState, _) -> beforeLandState.getAngle() == 0;
+        final BiPredicate<ShipState, ShipState> isStateAfterLandingAtAngle0 = (_, afterLandState) -> afterLandState.getAngle() == 0;
+        return isStateBeforeLandingAtAngle0.and(isStateAfterLandingAtAngle0);
+    }
+
 
     @Override
+
     public String toString() {
-        if (this.shipStates.isEmpty()) {
-            return "Ship ready to launch!";
-        } else {
-            final ShipState last = this.shipStates.getLast();
-            return String.format("POSITION: %s; SPEED: %s; ANGLE: %s", last.getPosition(), last.getSpeed(), last.getAngle());
-        }
-    }
-
-    public void printShipStates() {
-        System.out.println(getSolution());
-    }
-
-    public String getSolution() {
-        return shipStates.stream()
-                .skip(1)
-                .map(shipState -> String.format("%s %s", shipState.getAngle(), shipState.getPower()))
-                .collect(Collectors.joining(";")) + ";0 4";
+        return "Ship{" +
+                "id=" + id +
+                ", fitnessComputeResult=" + fitnessComputeResult.fitness() +
+                '}';
     }
 }

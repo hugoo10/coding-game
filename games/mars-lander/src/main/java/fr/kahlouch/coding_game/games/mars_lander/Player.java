@@ -3,17 +3,16 @@ package fr.kahlouch.coding_game.games.mars_lander;
 
 import fr.kahlouch.coding_game.games.mars_lander.model.Ship;
 import fr.kahlouch.coding_game.games.mars_lander.model.ShipGene;
-
+import fr.kahlouch.coding_game.games.mars_lander.model.ShipPath;
 import fr.kahlouch.coding_game.games.mars_lander.model.ShipState;
 import fr.kahlouch.coding_game.games.mars_lander.simulation.Simulation;
-import fr.kahlouch.genetic.algorithms._genetic.GeneticAlgorithm;
-import fr.kahlouch.genetic.algorithms._genetic.GeneticAlgorithmExecutionCommand;
-import fr.kahlouch.genetic.population.Individual;
-import fr.kahlouch.genetic.population.NewBornGeneration;
-import fr.kahlouch.genetic.utils.HistoryType;
+import fr.kahlouch.genetic.algorithm.execution.ExecutionLimit;
+import fr.kahlouch.genetic.algorithm.execution.listener.BestIndividualWriter;
+import fr.kahlouch.genetic.algorithm.execution.listener.BestPopulationListener;
 
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.List;
 
 public class Player {
     private static final String MAP_FILE = "start_speed_wrong_side.txt";
@@ -23,33 +22,22 @@ public class Player {
 
         Resolver.INSTANCE.loadWorldAndShipState(inputStream);
 
-        var command = GeneticAlgorithmExecutionCommand.builder()
-                .firstPopulation(Resolver.INSTANCE.firstGeneration())
-                .fitnessCap(300D)
-                .historyType(HistoryType.NO_HISTORY)
-                .timeCap(Duration.ofMillis(90))
-                .build();
+        final var listener = new BestPopulationListener<ShipGene, Ship, ShipPath>();
+        final var listenerwrite = new BestIndividualWriter<ShipGene, Ship, ShipPath>();
+
+        final var limit = new ExecutionLimit(300.0, Duration.ofMillis(90));
+        var firstGeneration = Resolver.INSTANCE.firstGeneration();
 
         do {
-            final var history = Resolver.INSTANCE.getGeneticAlgorithm().compute(command);
-            final var best = history.getCurrentBest();
+            final var best = Resolver.INSTANCE.executeAlgorithm(firstGeneration, limit, List.of(listener, listenerwrite));
 
-            if (best.fitness() >= 300) {
-                ((Ship)best.individual()).getShipStates().stream()
-                        .skip(1)
-                        .map(ShipState::toCommand)
-                        .forEach(System.out::println);
+            if (best.getFitnessComputeResult().fitness() >= 300) {
+                best.getShipStates().stream().skip(1).map(ShipState::toCommand).forEach(System.out::println);
                 break;
             }
 
             Resolver.INSTANCE.loadShipState(inputStream);
-            final var bestGeneration = history.getCurrentBestGeneration();
-            final var bestGenerationIndividuals = bestGeneration.getIndividuals().stream().map(Individual.class::cast).toList();
-            final var startingGeneration = new NewBornGeneration(bestGeneration.getGenerationNumber(), bestGenerationIndividuals);
-            command = command.toBuilder()
-                    .firstPopulation(startingGeneration)
-                    .build();
-
+            firstGeneration = listener.getBestPopulation().getIndividuals();
         } while (true);
     }
 }

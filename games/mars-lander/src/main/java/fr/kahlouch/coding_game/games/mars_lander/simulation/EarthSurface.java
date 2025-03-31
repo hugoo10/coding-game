@@ -7,7 +7,7 @@ public enum EarthSurface {
     DEEP("deep.txt"),
     HIGH("high.txt"),
     GROTTE_RIGHT("grotte_right.txt"),
-    GROE_LEFT("grotte_wrong.txt"),
+    GROTTE_LEFT("grotte_wrong.txt"),
     HARDCORE("hardcore.txt"),
     HARDEST("hardest.txt");
 

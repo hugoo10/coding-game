@@ -1,64 +1,76 @@
 package fr.kahlouch.coding_game.games.mars_lander.model;
 
-import fr.kahlouch.coding_game.games.mars_lander.model.factory.ShipFactory;
 import fr.kahlouch.coding_game.games.mars_lander.physics.Acceleration;
-import fr.kahlouch.genetic.population.BreededGene;
-import fr.kahlouch.genetic.population.Gene;
+import fr.kahlouch.genetic.algorithm.vo.Gene;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Gatherers;
+import java.util.stream.Stream;
 
 public class ShipGene implements Gene {
-    private int angle;
-    private int power;
-    private Acceleration acceleration;
+    private static final Map<Integer, Map<Integer, ShipGene>> MAP_ANGLE_POWER = new ConcurrentHashMap<>();
 
-    public ShipGene(int angle, int power) {
+
+    private final int angle;
+    private final int power;
+    private final Acceleration acceleration;
+
+    private ShipGene(int angle, int power) {
         this.angle = angle;
         this.power = power;
-        this.acceleration = new Acceleration(Math.cos(Math.toRadians(this.angle + 90D)), Math.sin(Math.toRadians(this.angle + 90D))).times(this.power);
+        this.acceleration = new Acceleration(StrictMath.cos(Math.toRadians(this.angle + 90D)), StrictMath.sin(Math.toRadians(this.angle + 90D)))
+                .times(this.power);
     }
 
-    public ShipGene(int angle, int power, Acceleration acceleration) {
-        this.angle = angle;
-        this.power = power;
-        this.acceleration = acceleration;
+    public static ShipGene of(double angle, double power) {
+        final var effectiveAngle = convertAngleDoubleToInt(angle);
+        final var effectivePower = convertPowerDoubleToInt(power);
+
+        return MAP_ANGLE_POWER.computeIfAbsent(effectiveAngle, _ -> new ConcurrentHashMap<>())
+                .computeIfAbsent(effectivePower, _ -> new ShipGene(effectiveAngle, effectivePower));
     }
 
     public int getAngle() {
         return angle;
     }
 
-    public void setAngle(int angle) {
-        this.angle = angle;
-    }
-
     public int getPower() {
         return power;
-    }
-
-    public void setPower(int power) {
-        this.power = power;
     }
 
     public Acceleration getAcceleration() {
         return acceleration;
     }
 
-    @Override
-    public String toString() {
-        return "new ShipGene(" + angle +
-                ", " + power + ", new Acceleration(" + acceleration.getX() + ", " + acceleration.getY() +
-                "));";
+
+    public static int convertAngleDoubleToInt(double angle) {
+        int angleInt = ((Long) Math.round(angle)).intValue();
+        if (angleInt <= -90) return -90;
+        if (angleInt >= 90) return 90;
+
+        return Stream.iterate(-90, i -> i <= 90, i -> i + 15)
+                .gather(Gatherers.windowSliding(2))
+                .map(list -> roundIfBetween(angleInt, list.getFirst(), list.getLast()))
+                .mapMulti(Optional<Integer>::ifPresent)
+                .findFirst()
+                .orElseThrow();
     }
 
-    @Override
-    public BreededGene breed(Gene gene, double random) {
-        final ShipGene mate = (ShipGene) gene;
-        double angle1 = (random * this.angle) + (1 - random) * mate.angle;
-        double angle2 = (random * mate.angle) + (1 - random) * this.angle;
-        double power1 = (random * this.power) + (1 - random) * mate.power;
-        double power2 = (random * mate.power) + (1 - random) * this.power;
+    private static Optional<Integer> roundIfBetween(int number, int lower, int upper) {
+        if (number < lower || number > upper) return Optional.empty();
+        final var lowerDiff = number - lower;
+        final var upperDiff = upper - number;
 
-        final var gene1 = ShipFactory.getGeneByAngleAndPower(ShipFactory.convertAngleDoubleToInt(angle1), ShipFactory.convertPowerDoubleToInt(power1));
-        final var gene2 = ShipFactory.getGeneByAngleAndPower(ShipFactory.convertAngleDoubleToInt(angle2), ShipFactory.convertPowerDoubleToInt(power2));
-        return new BreededGene(gene1, gene2);
+        if (lowerDiff < upperDiff) return Optional.of(lower);
+        return Optional.of(upper);
+    }
+
+
+    public static int convertPowerDoubleToInt(double power) {
+        int powerInt = ((Long) Math.round(power)).intValue();
+        if (powerInt <= 0) return 0;
+        return Math.min(powerInt, 4);
     }
 }

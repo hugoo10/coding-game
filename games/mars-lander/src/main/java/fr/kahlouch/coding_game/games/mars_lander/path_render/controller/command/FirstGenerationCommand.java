@@ -13,7 +13,7 @@ public class FirstGenerationCommand implements ICommand {
 
     @Override
     public void execute() {
-        this.displayState.firstGeneration();
+        this.displayState.firstPopulation();
     }
 
     @Override

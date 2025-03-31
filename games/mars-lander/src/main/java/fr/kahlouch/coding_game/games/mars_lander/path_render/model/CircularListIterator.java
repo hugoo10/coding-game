@@ -5,45 +5,50 @@ import java.util.NoSuchElementException;
 
 public class CircularListIterator<T> {
     private final List<T> list;
-    private int currentIndex;
+    private Integer currentIndex;
 
     public CircularListIterator(List<T> list) {
         this.list = list;
-        this.currentIndex = 0;
+        this.currentIndex = null;
     }
 
     public T next() {
         if (list.isEmpty()) {
             throw new NoSuchElementException();
         }
-        T element = list.get(currentIndex);
-        currentIndex = (currentIndex + 1) % list.size();
-        return element;
+        if (this.currentIndex == null) {
+            this.currentIndex = 0;
+        } else {
+            this.currentIndex = (currentIndex + 1) % list.size();
+        }
+        return list.get(currentIndex);
     }
 
     public T previous() {
         if (list.isEmpty()) {
             throw new NoSuchElementException();
         }
-
-        T element = list.get(currentIndex);
-        currentIndex = (currentIndex - 1 + list.size()) % list.size();
-        return element;
+        if (this.currentIndex == null) {
+            this.currentIndex = 0;
+        } else {
+            this.currentIndex = (currentIndex - 1 + list.size()) % list.size();
+        }
+        return list.get(currentIndex);
     }
 
     public T first() {
         if (list.isEmpty()) {
             throw new NoSuchElementException();
         }
-        return list.getFirst();
+        this.currentIndex = 0;
+        return list.get(currentIndex);
     }
 
     public T last() {
         if (list.isEmpty()) {
             throw new NoSuchElementException();
         }
-        return list.getLast();
+        this.currentIndex = list.size() - 1;
+        return list.get(currentIndex);
     }
-
-
 }

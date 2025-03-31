@@ -13,7 +13,7 @@ public class LastGenerationCommand implements ICommand {
 
     @Override
     public void execute() {
-        this.displayState.lastGeneration();
+        this.displayState.lastPopulation();
     }
 
     @Override

@@ -14,18 +14,11 @@
     <artifactId>mars-lander</artifactId>
 
     <dependencies>
- <!--       <dependency>
+        <dependency>
             <groupId>com.github.hugoo10</groupId>
             <artifactId>genetic</artifactId>
-            <version>1.0.1</version>
-        </dependency>-->
-
-        <dependency>
-            <groupId>fr.kahlouch</groupId>
-            <artifactId>Genetic</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.0</version>
         </dependency>
-
 
         <dependency>
             <groupId>com.github.hugoo10</groupId>

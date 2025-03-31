@@ -1,8 +1,6 @@
 package fr.kahlouch.coding_game.games.mars_lander.path_render.component.graphics;
 
 
-
-import fr.kahlouch.coding_game.games.mars_lander.model.Ship;
 import fr.kahlouch.coding_game.games.mars_lander.model.ShipState;
 import fr.kahlouch.coding_game.games.mars_lander.model.World;
 import fr.kahlouch.coding_game.games.mars_lander.path_render.model.DisplayState;
@@ -23,6 +21,7 @@ public class MarsGraphicsComponent {
     private static final float factor = 0.15f;
 
     public void render(DisplayState displayState, Graphics2D graphics) {
+        if (displayState.getPopulationToDisplay() == null) return;
         drawBackground(graphics);
         drawGenerationNb(displayState, graphics);
         drawSurface(graphics);
@@ -43,7 +42,7 @@ public class MarsGraphicsComponent {
         generationNb.setFill(Color.ORANGE);
         generationNb.setX(dimension.getX() * factor);
         generationNb.setY(dimension.getY() * factor);
-        generationNb.setText(displayState.getCurrentGeneration().getGenerationNumber() + "");
+        generationNb.setText(displayState.getPopulationToDisplay().getId() + "");
         graphics.draw(generationNb);
     }
 
@@ -54,13 +53,12 @@ public class MarsGraphicsComponent {
 
     private void drawPaths(DisplayState displayState, Graphics2D graphics) {
         if (displayState.isDisplayOnlyBest()) {
-            final var best = displayState.getCurrentGeneration().getBest();
-            final var shipBest = (Ship)displayState.getCurrentGeneration().getBest().individual();
-            convertShipStatesToLines(shipBest.getShipStates(), getColorByMark(best.fitness())).forEach(graphics::draw);
+            final var best = displayState.getPopulationToDisplay().getBest();
+            final var shipBest = displayState.getPopulationToDisplay().getBest();
+            convertShipStatesToLines(shipBest.getShipStates(), getColorByMark(best.getFitnessComputeResult().fitness())).forEach(graphics::draw);
         } else {
-            displayState.getCurrentGeneration().getIndividuals().forEach(individual -> {
-                final var ship = (Ship)individual.individual();
-                convertShipStatesToLines(ship.getShipStates(), getColorByMark(individual.fitness())).forEach(graphics::draw);
+            displayState.getPopulationToDisplay().getIndividuals().forEach(ship -> {
+                convertShipStatesToLines(ship.getShipStates(), getColorByMark(ship.getFitnessComputeResult().fitness())).forEach(graphics::draw);
             });
         }
     }
@@ -82,6 +80,8 @@ public class MarsGraphicsComponent {
             return Color.WHITE;
         } else if (fitness >= 200) {
             return Color.GREEN;
+        } else if (fitness >= 150) {
+            return Color.YELLOW;
         } else if (fitness >= 100) {
             return Color.BLUE;
         }

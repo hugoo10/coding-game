@@ -1,7 +1,6 @@
 package fr.kahlouch.coding_game.games.mars_lander.model;
 
 
-import fr.kahlouch.coding_game.games.mars_lander.model.factory.ShipFactory;
 import fr.kahlouch.coding_game.games.mars_lander.physics.Acceleration;
 import fr.kahlouch.coding_game.games.mars_lander.physics.Position;
 import fr.kahlouch.coding_game.games.mars_lander.physics.Speed;
@@ -57,7 +56,7 @@ public class ShipState {
         } else {
             this.power = previousState.power;
         }
-        final Acceleration acceleration = ShipFactory.getGeneByAngleAndPower(this.angle, this.power).getAcceleration().plus(World.MARS_GRAVITY);
+        final Acceleration acceleration = ShipGene.of(this.angle, this.power).getAcceleration().plus(World.MARS_GRAVITY);
         this.speed = previousState.speed.apply(acceleration);
         this.position = previousState.position.apply(speed);
         this.fuel = previousState.fuel - this.power;

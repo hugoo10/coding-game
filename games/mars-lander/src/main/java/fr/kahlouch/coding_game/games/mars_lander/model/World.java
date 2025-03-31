@@ -21,8 +21,8 @@ public class World {
     private Position landingZoneEnd = null;
     private int landingZoneEndIdx;
     private Position landingZoneMiddle = null;
-    private Position lowerLeft = new Position(0, 0);
-    private Position upperRight = new Position(7000, 3000);
+    private final Position lowerLeft = new Position(0, 0);
+    private final Position upperRight = new Position(7000, 3000);
     private double surfaceLength = 0;
     private double landingZoneLength = 0;
 
